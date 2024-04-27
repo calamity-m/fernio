@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"fmt"
 	"log/slog"
 )
 
@@ -42,10 +41,6 @@ func New(opts ...func(*Logger)) (*Logger, error) {
 
 	for _, fn := range opts {
 		fn(l)
-	}
-
-	if l.System == "" || l.Environment == "" || l.RequestIdHeader == "" {
-		return nil, fmt.Errorf("cannot have empty System, Environment or RequestIdHeader - %s, %s, %s", l.System, l.Environment, l.RequestIdHeader)
 	}
 
 	// Initialize will set defaults based on empty config

@@ -48,6 +48,7 @@ var (
 			}
 
 			// Get server configuration
+			server.DefaultSystem = "recorder"
 			serverCfg, err := server.NewViperConfig(vip, cfgOverwrite)
 			if err != nil {
 				fmt.Printf("Failed to load configuration: %v\n", err)

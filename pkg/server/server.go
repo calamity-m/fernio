@@ -6,11 +6,14 @@ import (
 )
 
 var (
-	defaultHost        string = "localhost"
-	defaultPort        int    = 8000
-	defaultTlsEnabled  bool   = false
-	defaultCertPath    string = "/run/secret/cert.crt"
-	defaultCertKeyPath string = "/run/secret/cert.key"
+	defaultHost            string = "localhost"
+	defaultPort            int    = 8000
+	defaultTlsEnabled      bool   = false
+	defaultCertPath        string = "/run/secret/cert.crt"
+	defaultCertKeyPath     string = "/run/secret/cert.key"
+	defaultEnvironment     string = "dev"
+	defaultRequestIdHeader string = "X-Request-Id"
+	DefaultSystem          string
 )
 
 type TLS struct {
@@ -51,9 +54,9 @@ func NewConfg(opts ...func(*Config)) *Config {
 func NewViperConfig(v *viper.Viper, overwrite bool) (*Config, error) {
 	cfg := NewConfg()
 
-	v.SetDefault("server.system", "fernio")
-	v.SetDefault("server.environment", "dev")
-	v.SetDefault("server.request-id-header", "X-Request-Id")
+	v.SetDefault("server.system", DefaultSystem)
+	v.SetDefault("server.environment", defaultEnvironment)
+	v.SetDefault("server.request-id-header", defaultRequestIdHeader)
 	v.SetDefault("server.host", defaultHost)
 	v.SetDefault("server.port", defaultPort)
 	v.SetDefault("server.tls.enabled", defaultTlsEnabled)
