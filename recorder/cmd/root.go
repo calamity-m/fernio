@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/calamity-m/fernio/lib/logging"
-	"github.com/calamity-m/fernio/lib/server"
+	"github.com/calamity-m/fernio/pkg/logging"
+	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/calamity-m/fernio/recorder/api"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

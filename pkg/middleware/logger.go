@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/calamity-m/fernio/lib/logging"
+	"github.com/calamity-m/fernio/pkg/logging"
 	"github.com/gin-gonic/gin"
 )
 

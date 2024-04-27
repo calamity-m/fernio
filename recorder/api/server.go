@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/calamity-m/fernio/lib/middleware"
-	"github.com/calamity-m/fernio/lib/server"
+	"github.com/calamity-m/fernio/pkg/middleware"
+	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/gin-gonic/gin"
 )
 
