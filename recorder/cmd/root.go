@@ -43,6 +43,10 @@ var (
 			vip.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 			vip.AutomaticEnv()
 
+			if cfgPath != "" {
+				vip.SetConfigFile(cfgPath)
+			}
+
 			// Get server configuration
 			serverCfg, err := server.NewViperConfig(vip, cfgOverwrite)
 			if err != nil {
