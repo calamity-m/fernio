@@ -6,21 +6,26 @@ import (
 	"os"
 )
 
-var RequestIdKey string = "request-id"
-
 type ServerHandler struct {
-	System       string
-	Environment  string
-	RequestIdKey string
+	System          string
+	Environment     string
+	RequestIdHeader string
 	slog.Handler
 }
 
-func (h *ServerHandler) Handle(ctx context.Context, r slog.Record) error {
-	if val, ok := ctx.Value(RequestIdKey).(string); ok {
-		r.AddAttrs(slog.String(RequestIdKey, val))
-	} else {
-		r.AddAttrs(slog.String(RequestIdKey, "unknown"))
+func retrieveCtxString(ctx context.Context, key any) string {
+	if val, ok := ctx.Value(key).(string); ok {
+		return val
 	}
+
+	return "unknown"
+}
+
+func (h *ServerHandler) Handle(ctx context.Context, r slog.Record) error {
+	r.AddAttrs(slog.String(h.RequestIdHeader, retrieveCtxString(ctx, h.RequestIdHeader)))
+	r.AddAttrs(slog.String("environment", retrieveCtxString(ctx, "environment")))
+	r.AddAttrs(slog.String("system", retrieveCtxString(ctx, "system")))
+
 	return h.Handler.Handle(ctx, r)
 }
 
@@ -34,8 +39,8 @@ func (h *ServerHandler) WithEnvironment(e string) *ServerHandler {
 	return h
 }
 
-func (h *ServerHandler) WithRequestIdKey(k string) *ServerHandler {
-	h.RequestIdKey = k
+func (h *ServerHandler) WithRequestIdHeader(k string) *ServerHandler {
+	h.RequestIdHeader = k
 	return h
 }
 
