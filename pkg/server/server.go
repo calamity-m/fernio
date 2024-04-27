@@ -13,7 +13,7 @@ var (
 	defaultCertKeyPath     string = "/run/secret/cert.key"
 	defaultEnvironment     string = "dev"
 	defaultRequestIdHeader string = "X-Request-Id"
-	DefaultSystem          string
+	DefaultSystem          string = "fernio"
 )
 
 type TLS struct {
