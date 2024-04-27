@@ -59,7 +59,7 @@ var (
 
 			// Override level depending on flag
 			if debug {
-				loggingCfg.Level = slog.LevelDebug
+				loggingCfg.WithLevel(slog.LevelDebug)
 			}
 
 			// Initialize our logger
