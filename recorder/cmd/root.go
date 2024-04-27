@@ -1,0 +1,111 @@
+package cmd
+
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/calamity-m/fernio/lib/logging"
+	"github.com/calamity-m/fernio/lib/server"
+	"github.com/calamity-m/fernio/recorder/api"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+var (
+	cfgPath string
+
+	cfgOverwrite bool
+
+	debug bool
+
+	rootCmd = &cobra.Command{
+		Use:   "recordersrv",
+		Short: "Start the recorder server",
+		Long:  "The recorder server provides an API for interacting with persistent storage for recording information.",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Starting recorder server")
+
+			// Initialize configuration directory
+			dir, err := configDir()
+			if err != nil {
+				fmt.Printf("Failed to get config directory: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Create viper object for configuration
+			vip := viper.New()
+			vip.SetConfigName("recorder")
+			vip.SetConfigType("yaml")
+			vip.AddConfigPath(dir)
+			vip.SetEnvPrefix("RECORDER")
+			vip.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+			vip.AutomaticEnv()
+
+			// Get server configuration
+			serverCfg, err := server.NewFromViper(vip, cfgOverwrite)
+			if err != nil {
+				fmt.Printf("Failed to load configuration: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Get logging configuration
+			loggingCfg, err := logging.NewFromViper(vip, cfgOverwrite)
+			if err != nil {
+				fmt.Printf("Failed to load configuration: %v\n", err)
+				os.Exit(1)
+			}
+
+			// Display configuration
+			fmt.Printf("Provided server configuration: %v\n", serverCfg)
+			fmt.Printf("Provided logging configuration: %v\n", loggingCfg)
+
+			// Initialize our logger
+			logger := logging.New(logging.WithConfig(*loggingCfg))
+			logger.Info("Initialized logger")
+
+			// Display info on our configurations
+			logger.Info(fmt.Sprintf("Using the following logging config: %v", loggingCfg))
+			logger.Info(fmt.Sprintf("Using the following server config: %v", serverCfg))
+
+			// Initialize our server
+			server := server.New(
+				server.WithConfig(*serverCfg),
+				server.WithLogger(logger))
+
+			api.Serve(server)
+
+		},
+	}
+)
+
+func configDir() (string, error) {
+	cfgDir, err := os.UserConfigDir()
+	if err != nil {
+		fmt.Printf("Failed to find user config directory %v", err)
+		return "", err
+	}
+
+	cfgDir = cfgDir + "/fern"
+	if err := os.MkdirAll(cfgDir, 0766); err != nil {
+		fmt.Printf("Failed to create config directory")
+		return "", err
+	}
+
+	return cfgDir, nil
+}
+
+func Initialize() {
+	rootCmd.PersistentFlags().StringVarP(&cfgPath, "config", "c", "", "Config Path")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug - overrides any configuration set")
+	rootCmd.PersistentFlags().BoolVar(&cfgOverwrite, "config-overwrite", false,
+		"Override config file on disk when loading configuration. Will load new options into disk")
+}
+
+func Execute() {
+	err := rootCmd.Execute()
+	if err != nil {
+		fmt.Printf("Failed to execute: %v\n", err)
+		os.Exit(1)
+	}
+}
