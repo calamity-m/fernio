@@ -44,7 +44,7 @@ var (
 			vip.AutomaticEnv()
 
 			// Get server configuration
-			serverCfg, err := server.NewFromViper(vip, cfgOverwrite)
+			serverCfg, err := server.NewViperConfig(vip, cfgOverwrite)
 			if err != nil {
 				fmt.Printf("Failed to load configuration: %v\n", err)
 				os.Exit(1)
@@ -59,11 +59,20 @@ var (
 
 			// Override level depending on flag
 			if debug {
-				loggingCfg.WithLevel(slog.LevelDebug)
+				loggingCfg.Level = slog.LevelDebug
 			}
 
 			// Initialize our logger
-			logger := logging.New(logging.WithConfig(*loggingCfg))
+			logger, err := logging.New(
+				logging.WithConfig(*loggingCfg),
+				logging.WithEnvironment(serverCfg.Environment),
+				logging.WithSystem(serverCfg.System),
+				logging.WithRequestIdHeader(serverCfg.RequestIdHeader))
+
+			if err != nil {
+				fmt.Printf("Failed to create logger: %v", err)
+				os.Exit(1)
+			}
 			logger.Info("Initialized logger")
 
 			// Display info on our configurations

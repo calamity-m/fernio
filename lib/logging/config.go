@@ -9,11 +9,9 @@ import (
 )
 
 type LogConfig struct {
-	Level       slog.Level `mapstructure:"level" json:"level"`
-	Structured  bool       `mapstructure:"structured" json:"structured"`
-	AddSource   bool       `mapstructure:"add-source" json:"certkeypath"`
-	System      string     `mapstructure:"system" json:"system"`
-	Environment string     `mapstructure:"environment" json:"environment"`
+	Level      slog.Level `mapstructure:"level" json:"level"`
+	Structured bool       `mapstructure:"structured" json:"structured"`
+	AddSource  bool       `mapstructure:"add-source" json:"certkeypath"`
 }
 
 // Defaults
@@ -23,36 +21,18 @@ var (
 	defaultAddSource  = false
 )
 
-func ParseLevel(level string) (slog.Level, error) {
-	var lvl slog.Level
-
-	err := lvl.UnmarshalText([]byte(level))
-
-	if err != nil {
-		return slog.LevelDebug, err
+func NewLogConfig(opts ...func(*LogConfig)) *LogConfig {
+	cfg := &LogConfig{
+		Level:      defaultLevel,
+		Structured: defaultStructured,
+		AddSource:  defaultAddSource,
 	}
-	return lvl, nil
-}
 
-func (cfg *LogConfig) WithLevel(level slog.Level) *LogConfig {
-	cfg.Level = level
+	for _, fn := range opts {
+		fn(cfg)
+	}
+
 	return cfg
-}
-
-func (cfg *LogConfig) WithStructured(structured bool) *LogConfig {
-	cfg.Structured = structured
-	return cfg
-}
-
-// Create a config instance with blank values, intended to be used with With... functions to create and modify
-// logging config
-func NewConfg() *LogConfig {
-	return &LogConfig{}
-}
-
-// Create a config instance with defaults set
-func NewDefault() *LogConfig {
-	return NewConfg().WithLevel(defaultLevel).WithStructured(defaultStructured)
 }
 
 // Create a config instance through viper, which will read configuration from disk,
@@ -61,7 +41,7 @@ func NewDefault() *LogConfig {
 // This method assumes that the provided viper has a configured filename/path set, such as:
 // using viper.SetConfigFile(...)
 func NewFromViper(v *viper.Viper, overwrite bool) (*LogConfig, error) {
-	cfg := NewConfg()
+	cfg := NewLogConfig()
 
 	v.SetDefault("logging.level", defaultLevel)
 	v.SetDefault("logging.structured", defaultStructured)
@@ -81,7 +61,7 @@ func NewFromViper(v *viper.Viper, overwrite bool) (*LogConfig, error) {
 	}
 
 	if err := v.UnmarshalKey("logging", &cfg, viper.DecodeHook(mapstructure.TextUnmarshallerHookFunc())); err != nil {
-		return NewDefault(), err
+		return cfg, err
 	}
 
 	return cfg, nil

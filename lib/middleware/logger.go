@@ -8,36 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	RequestIdHeader string = "X-Request-Id"
-)
-
-func LoggingMiddleware(logger *logging.Logger) gin.HandlerFunc {
+func Logger(logger *logging.Logger) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		// Start timer
 		start := time.Now()
 
+		// Set ctx for logged vars
+		ctx.Set("environment", logger.Environment)
+		ctx.Set("system", logger.System)
+
 		// Process Request
 		ctx.Next()
-
-		/*
-			param.TimeStamp = time.Now()
-			param.Latency = param.TimeStamp.Sub(start)
-
-			param.ClientIP = c.ClientIP()
-			param.Method = c.Request.Method
-			param.StatusCode = c.Writer.Status()
-			param.ErrorMessage = c.Errors.ByType(ErrorTypePrivate).String()
-
-			param.BodySize = c.Writer.Size()
-
-			if raw != "" {
-				path = path + "?" + raw
-			}
-
-			param.Path = path
-		*/
 
 		// Get params
 		attrs := []slog.Attr{
@@ -49,12 +31,8 @@ func LoggingMiddleware(logger *logging.Logger) gin.HandlerFunc {
 			slog.String("user-agent", ctx.Request.UserAgent()),
 		}
 
-		// attrs = append(attrs, slog.String("request-id", ctx.Request.Header.Get("request-id")))
-
 		end := time.Now()
 		attrs = append(attrs, slog.Duration("latency", end.Sub(start)))
-
-		ctx.Set(logging.RequestIdKey, "muh-val")
 
 		logger.LogAttrs(ctx, slog.LevelDebug, "Processed Request", attrs...)
 	}
