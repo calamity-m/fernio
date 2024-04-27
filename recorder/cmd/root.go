@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -56,9 +57,10 @@ var (
 				os.Exit(1)
 			}
 
-			// Display configuration
-			fmt.Printf("Provided server configuration: %v\n", serverCfg)
-			fmt.Printf("Provided logging configuration: %v\n", loggingCfg)
+			// Override level depending on flag
+			if debug {
+				loggingCfg.Level = slog.LevelDebug
+			}
 
 			// Initialize our logger
 			logger := logging.New(logging.WithConfig(*loggingCfg))
