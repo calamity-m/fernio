@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/calamity-m/fernio/pkg/middleware"
@@ -15,11 +16,10 @@ func Serve(s *server.Server) {
 	r.Use(middleware.RequestId(s.Config.RequestIdHeader), middleware.Logger(s.Log))
 
 	r.GET("/pong", func(c *gin.Context) {
-		s.Log.Debug("whooooo i am in pong")
-		c.String(http.StatusOK, "pong")
-		s.Log.Debug("whoooooooooo i have set c.String")
+		s.Log.DebugContext(c, "Pong endpoint hit")
+		c.String(http.StatusOK, "ping")
 	})
 
-	r.Run(":8000")
+	r.Run(fmt.Sprintf("%s:%v", s.Config.Host, s.Config.Port))
 
 }
