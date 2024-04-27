@@ -8,10 +8,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	Level      slog.Level `mapstructure:"level" json:"level"`
-	Structured bool       `mapstructure:"structured" json:"structured"`
-	AddSource  bool       `mapstructure:"add-source" json:"certkeypath"`
+type LogConfig struct {
+	Level       slog.Level `mapstructure:"level" json:"level"`
+	Structured  bool       `mapstructure:"structured" json:"structured"`
+	AddSource   bool       `mapstructure:"add-source" json:"certkeypath"`
+	System      string     `mapstructure:"system" json:"system"`
+	Environment string     `mapstructure:"environment" json:"environment"`
 }
 
 // Defaults
@@ -32,24 +34,24 @@ func ParseLevel(level string) (slog.Level, error) {
 	return lvl, nil
 }
 
-func (cfg *Config) WithLevel(level slog.Level) *Config {
+func (cfg *LogConfig) WithLevel(level slog.Level) *LogConfig {
 	cfg.Level = level
 	return cfg
 }
 
-func (cfg *Config) WithStructured(structured bool) *Config {
+func (cfg *LogConfig) WithStructured(structured bool) *LogConfig {
 	cfg.Structured = structured
 	return cfg
 }
 
 // Create a config instance with blank values, intended to be used with With... functions to create and modify
 // logging config
-func NewConfg() *Config {
-	return &Config{}
+func NewConfg() *LogConfig {
+	return &LogConfig{}
 }
 
 // Create a config instance with defaults set
-func NewDefault() *Config {
+func NewDefault() *LogConfig {
 	return NewConfg().WithLevel(defaultLevel).WithStructured(defaultStructured)
 }
 
@@ -58,7 +60,7 @@ func NewDefault() *Config {
 //
 // This method assumes that the provided viper has a configured filename/path set, such as:
 // using viper.SetConfigFile(...)
-func NewFromViper(v *viper.Viper, overwrite bool) (*Config, error) {
+func NewFromViper(v *viper.Viper, overwrite bool) (*LogConfig, error) {
 	cfg := NewConfg()
 
 	v.SetDefault("logging.level", defaultLevel)

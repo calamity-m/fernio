@@ -2,12 +2,17 @@ package logging
 
 import (
 	"log/slog"
-	"os"
 )
 
 type Logger struct {
-	config Config
+	Config LogConfig
 	*slog.Logger
+}
+
+func WithConfig(c LogConfig) func(*Logger) {
+	return func(l *Logger) {
+		l.Config = c
+	}
 }
 
 func New(opts ...func(*Logger)) *Logger {
@@ -22,16 +27,15 @@ func New(opts ...func(*Logger)) *Logger {
 	return l
 }
 
-func WithConfig(c Config) func(*Logger) {
-	return func(l *Logger) {
-		l.config = c
-	}
-}
-
 func (l *Logger) initalize() {
-	if l.config.Structured {
-		l.Logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: l.config.Level, AddSource: l.config.AddSource}))
+
+	handler := NewServerHandler().WithSystem("").WithEnvironment("").WithRequestIdKey("")
+
+	if l.Config.Structured {
+		handler = handler.WithJsonBase(l.Config.Level, l.Config.AddSource)
 	} else {
-		l.Logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: l.config.Level, AddSource: l.config.AddSource}))
+		handler = handler.WithTextBase(l.Config.Level, l.Config.AddSource)
 	}
+
+	l.Logger = slog.New(handler)
 }
