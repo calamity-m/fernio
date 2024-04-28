@@ -20,9 +20,8 @@ func Serve(s *server.Server) error {
 		gin.Recovery(),
 	)
 
-	r.GET("/pong", func(c *gin.Context) {
-		s.Log.DebugContext(c, "Pong endpoint hit")
-		c.String(http.StatusOK, "ping")
+	r.GET("", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"v1": "Loaded"})
 	})
 
 	err := food.AddGroup(r, s, "/v1")
