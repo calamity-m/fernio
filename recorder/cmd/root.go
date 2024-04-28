@@ -89,7 +89,11 @@ var (
 				server.WithConfig(*serverCfg),
 				server.WithLogger(logger))
 
-			api.Serve(server)
+			err = api.Serve(server)
+			if err != nil {
+				logger.Error(fmt.Sprintf("Failed to add food group for the following reason: %v", err))
+				os.Exit(1)
+			}
 
 		},
 	}
