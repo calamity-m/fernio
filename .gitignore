@@ -1,5 +1,20 @@
-.idea/
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Bin dir
 bin/
+
+# Go workspace file
+go.work
+
+# Ignore local drawings
+design.excalidraw.svg
+
+# Ignore directories for ide config 
+.idea/
 .fleet/
 .vscode/
-.svg
