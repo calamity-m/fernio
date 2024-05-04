@@ -1,107 +1,97 @@
 package persistence
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Filter struct {
-	Term  interface{}
-	Value interface{}
+	Term  any
+	Value any
 }
 
 // High level interface for a persistent store. Abstracted this way as while it's pointless, the intent is to play with
 // and test subbing in/out different databases, allowing a service to not care about its storage mechanisms.
+
 type StorageDriver interface {
-	// Put(model interface{})
-	// GetOne(filter interface{}) interface{}
-	// GetAll(filter interface{}) interface{}
-	// Delete(filter interface{}) interface{}
+	Connect(uri string) error
+	Disconnect() error
 }
 
-type Dri struct {
-	StorageDriver
-}
+type StorageHandler[T any] interface {
+	// Handle fetching and gathering the connection
+	Connect(uri string) error
+	// Handle disconnection when done
+	Disconnect() error
 
-type PersistentRepository[T interface{}] interface {
-	Put(model *T) error
+	// Shortcut function for commonly used get by id
+	GetById(id string) (T, error)
+	// Used for getting one entity
 	GetOne(filter Filter) (T, error)
+	// Used for creating or updating one entity
+	PutOne(data T) (T, error)
+	// Used for getting many entities at once
 	GetMany(filter Filter) ([]T, error)
-	GetAll() ([]*T, error)
-	Delete(filter Filter) error
+	// Used for creating or updating many entities at once
+	PutMany(datas []T) ([]T, error)
+	// Used for deleting one
+	DeleteOne(filter Filter) error
+	// Used for deleting many
+	DeleteMany(filter Filter) error
 }
 
-type Driver interface {
-	Info()
+type MongoHandler[T any] struct {
 }
 
-type Repository[T interface{}] interface {
-	GetOne(filter Filter) (T, error)
+// Handle fetching and gathering the connection
+func (h *MongoHandler[T]) Connect(uri string) error {
+	fmt.Println("i connected")
+	return nil
 }
 
-type BaseRepository[T interface{}] struct {
+// Handle disconnection when done
+func (h *MongoHandler[T]) Disconnect() error {
+	panic("not implemented") // TODO: Implement
+}
+
+// Shortcut function for commonly used get by id
+func (h *MongoHandler[T]) GetById(id string) (T, error) {
+	fmt.Println("Getting something from mongo, id")
+	var out T
+	return out, nil
+}
+
+// Used for getting one entity
+func (h *MongoHandler[T]) GetOne(filter Filter) (T, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// Used for creating or updating one entity
+func (h *MongoHandler[T]) PutOne(data T) (T, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// Used for getting many entities at once
+func (h *MongoHandler[T]) GetMany(filter Filter) ([]T, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// Used for creating or updating many entities at once
+func (h *MongoHandler[T]) PutMany(datas []T) ([]T, error) {
+	panic("not implemented") // TODO: Implement
+}
+
+// Used for deleting one
+func (h *MongoHandler[T]) DeleteOne(filter Filter) error {
+	panic("not implemented") // TODO: Implement
+}
+
+// Used for deleting many
+func (h *MongoHandler[T]) DeleteMany(filter Filter) error {
+	panic("not implemented") // TODO: Implement
+}
+
+type Repository[T any] struct {
 	Host     string
 	URI      string
 	Username string
 	Password string
-	Driver   StorageDriver
-	Repository[T]
-}
-
-type RepositoryImplementation[T interface{}] struct {
-	driver Driver
-	Repository[T]
-}
-
-/// impl test
-
-type FakeD struct {
-}
-
-func (d *FakeD) Info() {
-	panic("not implemented") // TODO: Implement
-}
-
-type ModelA struct {
-	id string
-}
-
-type ModelB struct {
-	name string
-}
-
-type ModelARepository struct{}
-
-func (r *ModelARepository) GetOne(filter Filter) (ModelA, error) {
-	fmt.Println("Model A GetOne")
-	return ModelA{}, nil
-}
-
-type Stuff struct {
-	Id string
-}
-
-type ModelBRepository[T ModelB] struct {
-	BaseRepository[T]
-	Stuff
-}
-
-func (r *ModelBRepository[T]) GetOne(filter Filter) (T, error) {
-	fmt.Println("Model A GetOne")
-	return T{name: "h"}, nil
-}
-
-func DoRepo[T interface{}](repo Repository[T]) {
-	fmt.Println(repo)
-	fmt.Println(repo.GetOne(Filter{}))
-}
-
-func Testing() {
-
-	modelA := &ModelARepository{}
-	// Could force people to use something like NewRepository under fernio/recorder/internal/storage? idk
-	modelB := &ModelBRepository[ModelB]{BaseRepository: BaseRepository[ModelB]{Driver: FakeD{}}}
-
-	DoRepo(modelA)
-	DoRepo(modelB)
-
+	Handler  StorageHandler[T]
 }

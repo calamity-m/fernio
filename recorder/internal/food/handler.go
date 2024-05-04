@@ -5,30 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/calamity-m/fernio/pkg/persistence"
 	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/gin-gonic/gin"
 )
 
-/*
-This isn't used/doesn't make sense as there is no inheritance in go only composition.
-
-better to just expect the interface of persistence.Repository
-
-func GetFoodTest(s *server.Server, repo *persistence.BaseRepository[FoodDao], repo2 *persistence.BaseRepository[FoodDao]) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-
-		if repo == repo2 {
-			if repo.Driver == repo2.Driver {
-				fmt.Println("eq")
-			}
-		}
-		ctx.String(http.StatusOK, "no")
-	}
-}
-*/
-
-func GetFoodById(s *server.Server, repo persistence.Repository[FoodDao]) gin.HandlerFunc {
+func GetFoodById(s *server.Server, repo *FoodRepo) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -37,9 +18,7 @@ func GetFoodById(s *server.Server, repo persistence.Repository[FoodDao]) gin.Han
 			ctx.JSON(http.StatusBadRequest, gin.H{"Invalid Request": "Missing ID"})
 		}
 
-		filt := persistence.Filter{Term: "id", Value: id}
-
-		rtn, err := repo.GetOne(filt)
+		rtn, err := repo.Handler.GetById(id)
 
 		ctx.JSON(http.StatusOK, gin.H{"get": rtn, "err": err})
 	}

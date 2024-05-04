@@ -1,8 +1,6 @@
 package food
 
 import (
-	"fmt"
-
 	"github.com/calamity-m/fernio/pkg/persistence"
 	"github.com/google/uuid"
 )
@@ -12,57 +10,41 @@ type FoodDao struct {
 	Name string
 }
 
-type FoodRepository struct{}
-
-func (fr FoodRepository) Put(model *FoodDao) error {
-	fmt.Println("put")
-	return nil
+type FoodRecordDao struct {
+	Id   string
+	Name string
 }
 
-func (fr FoodRepository) GetOne(filter persistence.Filter) (FoodDao, error) {
-	fmt.Println("get")
-	return FoodDao{}, nil
+type FoodRepo struct {
+	persistence.Repository[FoodDao]
 }
 
-func (fr FoodRepository) GetMany(filter persistence.Filter) ([]FoodDao, error) {
-	fmt.Println("getm")
-	return nil, nil
+type FoodRecordRepo struct {
+	persistence.Repository[FoodRecordDao]
 }
 
-func (fr FoodRepository) GetAll() ([]*FoodDao, error) {
-	fmt.Println("getal")
-	return nil, nil
+func NewFoodRecordRepo() *FoodRecordRepo {
+
+	repo := &FoodRecordRepo{}
+
+	v := &persistence.MongoHandler[FoodRecordDao]{}
+
+	repo.Handler = v
+
+	repo.Handler.Connect("")
+
+	return repo
 }
 
-func (fr FoodRepository) Delete(filter persistence.Filter) error {
-	fmt.Println("del")
-	return nil
-}
+func NewFoodRepo() *FoodRepo {
 
-func uhhhhh(repo persistence.PersistentRepository[FoodDao]) {
-	repo.GetAll()
-}
+	repo := &FoodRepo{}
 
-func StorageTesting() {
-	// filter := &FoodFilter{}
+	v := &persistence.MongoHandler[FoodDao]{}
 
-	foodrepo := &FoodRepository{}
+	repo.Handler = v
 
-	foodrepo.Put(&FoodDao{})
+	repo.Handler.Connect("")
 
-	uhhhhh(foodrepo)
-
-}
-
-type FoodRepo[T FoodDao] struct {
-	persistence.BaseRepository[T]
-}
-
-func (r *FoodRepo[T]) GetOne(filter persistence.Filter) (T, error) {
-	fmt.Println("fake")
-	return T{Name: "FakeItem", Id: uuid.New()}, nil
-}
-
-func NewFoodRepo() *FoodRepo[FoodDao] {
-	return &FoodRepo[FoodDao]{BaseRepository: persistence.BaseRepository[FoodDao]{Driver: persistence.FakeD{}}}
+	return repo
 }

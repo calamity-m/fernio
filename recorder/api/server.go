@@ -31,7 +31,6 @@ func Serve(s *server.Server) error {
 	v1 := r.Group("/v2")
 	{
 		v1.GET("/food/:id", food.GetFoodById(s, repo))
-		v1.GET("/food2/:id", food.GetFoodTest(s, &repo.BaseRepository, &repo.BaseRepository))
 
 	}
 
