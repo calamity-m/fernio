@@ -6,7 +6,7 @@ import (
 
 	"github.com/calamity-m/fernio/pkg/middleware"
 	"github.com/calamity-m/fernio/pkg/server"
-	"github.com/calamity-m/fernio/recorder/internal/food"
+	"github.com/calamity-m/fernio/recorder/internal/records/food"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,11 +36,13 @@ func Serve(s *server.Server) error {
 		}
 	*/
 
-	err := food.AddGroup(r, s, "/v1")
-	if err != nil {
-		return err
+	foodRepo := &food.PostgresSqlFoodRepository{}
+
+	v1 := r.Group("/v1")
+	{
+		v1.GET("/food/:id", food.GetFoodRecordById(s, foodRepo))
 	}
 
-	err = r.Run(fmt.Sprintf("%s:%v", s.Config.Host, s.Config.Port))
+	err := r.Run(fmt.Sprintf("%s:%v", s.Config.Host, s.Config.Port))
 	return err
 }
