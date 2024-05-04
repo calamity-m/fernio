@@ -7,8 +7,10 @@ import (
 	"strings"
 
 	"github.com/calamity-m/fernio/pkg/logging"
+	"github.com/calamity-m/fernio/pkg/persistence"
 	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/calamity-m/fernio/recorder/api"
+	"github.com/calamity-m/fernio/recorder/internal/food"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -88,6 +90,9 @@ var (
 			server := server.New(
 				server.WithConfig(*serverCfg),
 				server.WithLogger(logger))
+
+			persistence.Testing()
+			food.StorageTesting()
 
 			err = api.Serve(server)
 			if err != nil {

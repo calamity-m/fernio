@@ -6,7 +6,7 @@ import (
 
 	"github.com/calamity-m/fernio/pkg/middleware"
 	"github.com/calamity-m/fernio/pkg/server"
-	"github.com/calamity-m/fernio/recorder/food"
+	"github.com/calamity-m/fernio/recorder/internal/food"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +23,17 @@ func Serve(s *server.Server) error {
 	r.GET("", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"v1": "Loaded"})
 	})
+
+	// repo := persistence.
+	repo := food.NewFoodRepo()
+	fmt.Printf("$s is: %p\n", &s)
+	fmt.Printf("$repo-serve is: %p\n", &repo)
+	v1 := r.Group("/v2")
+	{
+		v1.GET("/food/:id", food.GetFoodById(s, repo))
+		v1.GET("/food2/:id", food.GetFoodTest(s, &repo.BaseRepository, &repo.BaseRepository))
+
+	}
 
 	err := food.AddGroup(r, s, "/v1")
 	if err != nil {
