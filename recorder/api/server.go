@@ -25,14 +25,16 @@ func Serve(s *server.Server) error {
 	})
 
 	// repo := persistence.
-	repo := food.NewFoodRepo()
-	fmt.Printf("$s is: %p\n", &s)
-	fmt.Printf("$repo-serve is: %p\n", &repo)
-	v1 := r.Group("/v2")
-	{
-		v1.GET("/food/:id", food.GetFoodById(s, repo))
+	/*
+		repo := food.NewFoodRepo()
+		fmt.Printf("$s is: %p\n", &s)
+		fmt.Printf("$repo-serve is: %p\n", &repo)
+		v1 := r.Group("/v2")
+		{
+			v1.GET("/food/:id", food.GetFoodById(s, repo))
 
-	}
+		}
+	*/
 
 	err := food.AddGroup(r, s, "/v1")
 	if err != nil {

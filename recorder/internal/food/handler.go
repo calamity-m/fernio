@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetFoodById(s *server.Server, repo *FoodRepo) gin.HandlerFunc {
+func GetFoodById(s *server.Server, repo persistence.StorageHandler[FoodDao]) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -19,13 +19,9 @@ func GetFoodById(s *server.Server, repo *FoodRepo) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"Invalid Request": "Missing ID"})
 		}
 
-		rtn, err := repo.Handler.GetById(id)
-
 		filt := persistence.Filter{Terms: map[string]any{"Hello": "there"}}
 
-		repo.Handler.GetMany(filt)
-
-		ctx.JSON(http.StatusOK, gin.H{"get": rtn, "err": err, "fakefilt": filt})
+		ctx.JSON(http.StatusOK, gin.H{"get": "rtn", "err": "err", "fakefilt": filt})
 	}
 
 }
