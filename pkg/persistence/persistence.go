@@ -1,10 +1,20 @@
 package persistence
 
-import "fmt"
+import (
+	"fmt"
+)
 
+// This might be better to use?
 type Filter struct {
-	Term  any
-	Value any
+	Terms map[string]any
+}
+
+func FiltPlay() {
+	filter := Filter{Terms: map[string]any{"a": "b"}}
+
+	for term := range filter.Terms {
+		fmt.Printf("Term: %v, Value: %v\n", term, filter.Terms[term])
+	}
 }
 
 // High level interface for a persistent store. Abstracted this way as while it's pointless, the intent is to play with

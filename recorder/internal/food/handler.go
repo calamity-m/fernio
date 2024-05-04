@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/calamity-m/fernio/pkg/persistence"
 	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,11 @@ func GetFoodById(s *server.Server, repo *FoodRepo) gin.HandlerFunc {
 
 		rtn, err := repo.Handler.GetById(id)
 
-		ctx.JSON(http.StatusOK, gin.H{"get": rtn, "err": err})
+		filt := persistence.Filter{Terms: map[string]any{"Hello": "there"}}
+
+		repo.Handler.GetMany(filt)
+
+		ctx.JSON(http.StatusOK, gin.H{"get": rtn, "err": err, "fakefilt": filt})
 	}
 
 }

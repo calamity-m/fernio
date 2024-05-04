@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/calamity-m/fernio/pkg/logging"
+	"github.com/calamity-m/fernio/pkg/persistence"
 	"github.com/calamity-m/fernio/pkg/server"
 	"github.com/calamity-m/fernio/recorder/api"
 	"github.com/spf13/cobra"
@@ -88,6 +89,8 @@ var (
 			server := server.New(
 				server.WithConfig(*serverCfg),
 				server.WithLogger(logger))
+
+			persistence.FiltPlay()
 
 			err = api.Serve(server)
 			if err != nil {
