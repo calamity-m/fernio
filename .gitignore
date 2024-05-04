@@ -12,7 +12,7 @@ bin/
 go.work
 
 # Ignore local drawings
-design.excalidraw.svg
+*.svg
 
 # Ignore directories for ide config 
 .idea/
