@@ -10,11 +10,6 @@ type Filter struct {
 // High level interface for a persistent store. Abstracted this way as while it's pointless, the intent is to play with
 // and test subbing in/out different databases, allowing a service to not care about its storage mechanisms.
 
-type StorageDriver interface {
-	Connect(uri string) error
-	Disconnect() error
-}
-
 type StorageHandler[T any] interface {
 	// Handle fetching and gathering the connection
 	Connect(uri string) error
